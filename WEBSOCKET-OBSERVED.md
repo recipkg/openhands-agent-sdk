@@ -1,5 +1,7 @@
 # Agent Server 事件 WebSocket：运行样本
 
+这是旧的 `/sockets/events` 端点，不是固定版本 Canvas 默认使用的会话端点；后者的序号、帧封装和实测结果见 `SESSION-SOCKET-OBSERVED.md`。
+
 来源和隔离测试环境与 `SERVER-OBSERVED.md` 相同，固定上游提交 `46b1fa5cb91ada17e6ec938c7e8624a4fa19fa98`。客户端通过回环地址连接服务，使用临时会话、测试密钥和本机模拟模型；先正常停止并重启服务，再订阅已有会话。以下是这组输入的观察，不是完整协议或兼容性声明。
 
 ## 连接与认证
