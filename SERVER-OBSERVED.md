@@ -6,7 +6,7 @@
 
 - 在 `OH_SESSION_API_KEYS_0` 设置测试 key 的样本中，`GET /ready` 无凭据返回 200 和 `{"status":"ready"}`；`GET /api/conversations/search` 无 key、错误 key 或仅带 `Authorization: Bearer <key>` 均返回 401，带正确 `X-Session-API-Key` 返回 200 和空页面。`GET /api/conversations/count` 返回数字 0。
 - 固定提交的上游 README 将会话 key 描述为 Bearer 认证；但本样本和 `dependencies.py` 的受保护常规 API 检查使用 `X-Session-API-Key`。这是固定版本、上述配置和请求的具体冲突，不推广到所有版本、静态工作区 cookie、WebSocket 或其他鉴权路径。
-- 源码将 `/ready`、`/health`、`/alive` 等健康路由与常规 `/api` 认证路由分开；初始化和工作区静态路由还有各自的中间件。代理、跨源、会话 cookie、密钥轮换和 WebSocket 尚未在此测试。
+- 源码将 `/ready`、`/health`、`/alive` 等健康路由与常规 `/api` 认证路由分开；初始化和工作区静态路由还有各自的中间件。代理、跨源、会话 cookie 和密钥轮换尚未在此测试；WebSocket 首帧认证的单独样本见 `WEBSOCKET-OBSERVED.md`。
 
 ## 创建、消息和运行
 
@@ -17,6 +17,6 @@
 ## 重启与删除
 
 - 在服务正常退出、保留同一临时会话目录后重启，样本可按原 ID 获取会话，事件 ID 列表与重启前一致，计数保留。删除临时会话返回 200，随后读取为 404；两条测试会话均删除后计数为 0。该样本不覆盖进程崩溃、并发写入、恢复正在执行的工具或存储损坏。
-- 路由源码还提供暂停、中断、确认策略、事件筛选和 WebSocket 等功能；其参数、认证、重连、并发及错误语义未在此样本完整核验，不能因上述结果声称远程协议或服务端已完整重建。
+- 路由源码还提供暂停、中断、确认策略、事件筛选和 WebSocket 等功能；其参数、认证、重连、并发及错误语义未完整核验，不能因上述结果声称远程协议或服务端已完整重建。
 
 可运行测试见 [standard-library-verification](https://github.com/recipkg/standard-library-verification) 的 `tests/test_openhands_server.py`。该测试只启动和关闭自己的本机进程与 fixture；其临时环境不是安全沙箱。上游样本通过不等于独立重建通过。
