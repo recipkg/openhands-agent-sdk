@@ -19,3 +19,11 @@
 **调用时有执行行为：**本样本技能正文中的 `!` 后接反引号命令在调用时由 shell 执行，输出被嵌入返回正文，工作目录为会话工作区；代码围栏中的相同写法没有执行。样本中的内联命令只输出固定文本并创建临时标记；Git 子模块中的 `scripts/fixture.sh` 没有自动执行。源码显示该渲染使用进程权限，不能把技能来源当作安全沙箱；未测试所有转义、失败、超时或其他触发器。安装、发现、列出和调用是不同阶段，不能假设调用只读取 Markdown。
 
 可用 [standard-library-verification](https://github.com/recipkg/standard-library-verification) 的 `test_openhands_sdk.py` 指定 `RECIPKG_TEST_OPENHANDS_PYTHON` 执行；测试建立临时 Git 仓库、本地子模块、模拟 LLM 和工作区。恢复、并发、不同工具集、网络权限、远端工作区、技能文件变化后的刷新以及独立重建仍未验证。
+
+## 模型实际发起调用
+
+同一固定源码和锁文件在 Linux / Python 3.13.16 上运行；临时工作区含可调用的 `alpha` 与 frontmatter 设置 `disable-model-invocation: true` 的 `hidden`，通过只允许本机端口的模拟 OpenAI 兼容 HTTP 服务返回工具调用。Python socket 被限制到该端口，并非操作系统安全沙箱，也没有使用真实模型。
+
+在 `AgentContext(load_project_skills=True)` 和无显式工具的样本中，首个模型请求包含 `invoke_skill` 工具；提示上下文包含 `alpha` 简介但不含正文，也不含禁用技能的简介或正文。模拟模型依次请求两次 `alpha`、一个未知名称和 `hidden`：前两次工具结果包含正文与内联命令输出，未知和禁用名称分别返回错误观察。两次相同调用让内联命令各执行一次；会话 `invoked_skills` 仍只有一个 `alpha`，该列表的去重不表示副作用被去重。真实模型、远端执行、会话恢复后的行为及其他触发条件仍未验证。
+
+源码中 `InvokeSkillTool.create()` 的工具注解同时标记 `readOnlyHint=true` 和 `idempotentHint=true`，而本机样本的内联命令有写文件副作用且重复运行。`tool.py` 的安全风险预测路径会检查 `readOnlyHint`；这是源码观察，不等于本样本测试了确认策略或全部安全机制。不能仅依据这些注解认定技能调用只读、幂等或处于沙箱。
