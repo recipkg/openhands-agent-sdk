@@ -5,7 +5,7 @@ format = "recipkg/1"
 
 [package]
 name = "openhands-agent-sdk"
-version = "0.1.8"
+version = "0.1.9"
 kind = "software"
 description = "面向软件开发的 Agent SDK 与服务端重建配方草案。"
 entry = "BUILD_PROMPT.md"
